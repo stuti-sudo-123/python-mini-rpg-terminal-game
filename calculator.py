@@ -1,1 +1,1 @@
-print("Welcome to Calcilator ^-^")
+print("Weather app ^-^")
