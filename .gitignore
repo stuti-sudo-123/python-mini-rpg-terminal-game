@@ -1,0 +1,17 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Game save file
+save.json
+
+# VS Code settings
+.vscode/
+
+# Windows system files
+Thumbs.db
