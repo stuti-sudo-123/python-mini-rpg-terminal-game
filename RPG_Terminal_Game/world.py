@@ -174,5 +174,53 @@ class World:
     def _spawn_enemies(self):
         for room in self.rooms.values():
             room["enemy_objects"]=[Enemy(e) for e in room["enemies"]]
-    def get_room(self):
-        pass
+    def get_room(self,room_id):
+        return self.rooms.get(room_id)
+    def get_live_enemies(self,room_id):
+        room=self.rooms.get(room_id)
+        if not room:
+            return []
+        return [e for e in room["enemy_objects"] if e.is_alive()]
+    def mark_visited(self,room_id):
+        room=self.rooms.get(room_id)
+        if not room:
+            return 
+        room["visited"]=True
+    def take_item(self,room_id,item_name):
+        room=self.rooms.get(room_id)
+        item=next((i for i in room["items"] if i["name"].lower()==item_name.lower()),None)
+        if not item :
+            return None, f"No item with {item_name} name"
+        if item["type"]=="teleporter":
+            if self.get_live_enemies(room_id):
+                return None,"Kill all enemies first"
+            else:
+                room["items"].remove(item)
+                return item, "teleporter_activated"
+        else:
+            room["items"].remove(item)
+            return item, "picked_up"
+    def next_level(self):
+        self.current_level+=1
+        if self.current_level>len(LEVEL_START_ROOMS):
+            return "game_complete"
+        return LEVEL_START_ROOMS[self.current_level-1]
+    def to_dict(self):
+        room_data={}
+        for room_id, room in self.rooms.items():
+            room_data[room_id]={
+            "visited":        room["visited"],
+            "items":          room["items"],
+            "enemies_alive": [e.type for e in self.get_live_enemies(room_id)]
+            }
+        return {
+                "current_level": self.current_level,
+                "rooms": room_data
+            }
+    def from_dict(self,data):
+        self.current_level=data["current_level"]
+        for room_id,room in self.rooms.items():
+            room_data=data["rooms"][room_id]
+            room["visited"]=room_data["visited"]
+            room["enemy_objects"]=[Enemy(e) for e in room_data["enemies_alive"]]
+            room["items"]= room_data["items"]
