@@ -80,5 +80,5 @@ class Game:
         print(f"\n{room['emoji']} {room['name']}")
         print(room['description'])
         if room["items"]:
-            
+            pass
 
