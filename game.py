@@ -81,5 +81,4 @@ class Game:
         print(room['description'])
         if room["items"]:
             pass
-        
 
