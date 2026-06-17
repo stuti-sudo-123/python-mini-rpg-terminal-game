@@ -10,7 +10,7 @@ class Player:
         self.xp_to_next = 50
         self.gold = 10
         self.inventory = []
-        self.current_room = "entrance"
+        self.current_room = "auren_crash"
     def take_damage(self,amount):
         damage=max(1,amount-self.defense)
         self.health=max(0,self.health-damage)
@@ -86,3 +86,11 @@ class Player:
         p.inventory = data["inventory"]
         p.current_room = data["current_room"]
         return p        
+    def show_inventory(self):
+        if not self.inventory:
+            print("Your inventory is empty.")
+            return
+        print("\n── Inventory ──────────────────")
+        for item in self.inventory:
+            print(f"  {item['name']} — {item['type']} (+{item['value']})")
+        print("───────────────────────────────")

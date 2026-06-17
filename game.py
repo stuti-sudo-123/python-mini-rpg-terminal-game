@@ -132,7 +132,12 @@ class Game:
         elif result == "dead":
             self._game_over()
         elif result == "fled":
-            print("You retreated!")
+            room = self.world.get_room(self.player.current_room)
+            if room["exits"]:
+                prev = list(room["exits"].values())[0]
+                self.player.current_room = prev
+                print("You retreated to safety!")
+                self._look_at_room()
     def _check_win(self):
         if self.player.current_room == "void_nexus":
             if not self.world.get_live_enemies("void_nexus"):
