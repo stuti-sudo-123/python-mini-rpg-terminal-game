@@ -1,6 +1,6 @@
 from player import Player
 from world import World
-from enemy import Enemy
+from combat import Combat
 from save_system import save_game , load_game,save_exists,delete_save
 class Game:
     def __init__(self):
@@ -120,9 +120,53 @@ class Game:
         success,msg=self.player.use_item(item_name)
         print(msg)
     def _check_for_combat(self):
-        pass
+        enemies=self.world.get_live_enemies(self.player.current_room)
+        if not enemies:
+            return
+        combat=Combat(self.player,enemies)
+        result=combat.run()
+        if result == "victory":
+            print("\n🏆 All threats eliminated!")
+            combat.distribute_rewards()
+            self._check_win()
+        elif result == "dead":
+            self._game_over()
+        elif result == "fled":
+            print("You retreated!")
     def _check_win(self):
         if self.player.current_room == "void_nexus":
             if not self.world.get_live_enemies("void_nexus"):
                 self._victory()
-    
+    def _game_over(self):
+        print("\n💀 GAME OVER")
+        print(f"{self.player.name} has fallen in the void.")
+        delete_save()
+        self.running = False
+    def _victory(self):
+        print("\n🌌 YOU WIN!")
+        print(f"{self.player.name} has defeated The Ancient One!")
+        print(f"Level reached: {self.player.level}")
+        print(f"Crystals collected: {self.player.gold}")
+        delete_save()
+        self.running = False
+    def _quit(self):
+        answer = input("Save before quitting? (y/n) > ").strip().lower()
+        if answer == "y":
+            save_game(self.player, self.world)
+        print("Farewell, Void Walker.")
+        self.running = False
+    def _show_help(self):
+        print("\n── COMMANDS ─────────────────────")
+        print("go <direction>   move between rooms")
+        print("n/s/e/w          shortcut movement")
+        print("look             describe current room")
+        print("take <item>      pick up an item")
+        print("use <item>       use from inventory")
+        print("stats            show your stats")
+        print("inv              show inventory")
+        print("save             save game")
+        print("quit             quit game")
+        print("─────────────────────────────────")
+if __name__ == "__main__":
+    game = Game()
+    game.start()
