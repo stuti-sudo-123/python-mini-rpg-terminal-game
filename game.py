@@ -80,5 +80,40 @@ class Game:
         print(f"\n{room['emoji']} {room['name']}")
         print(room['description'])
         if room["items"]:
-            pass
-
+            print("Items: "+ ", ".join(i["name"] for i in room["items"]))
+        enemies=self.world.get_live_enemies(self.player.current_room)
+        if enemies:
+            print("Enemies: " + ", ".join(f"{e.emoji} {e.name}" for e in enemies))
+        if room['exits']:
+            print("Exits: " + ", ".join(room['exits'].keys()))
+        else:
+            print("No exits — find the Quantum Shard to teleport.")
+    def _move(self,direction):
+        room=self.world.get_room(self.player.current_room)
+        if direction not in room['exits']:
+                print(f"You can't go {direction} from here.")
+                return
+        if self.world.get_live_enemies(self.player.current_room):
+            print("Defeat all enemies before moving!")
+            return        
+        self.player.current_room=room['exits'][direction]
+        self._look_at_room()
+        self._check_for_combat()
+    def _take_item(self,item_name):
+        item,signal=self.world.take_item(self.player.current_room,item_name)
+        if not item:
+            print(signal)
+            return
+        if signal=="teleporter_activate":
+            print("⚡ Quantum Shard acquired! Teleporting...")
+            next_room=self.world.next_level()
+            if next_room=="game_complete":
+                self._victory()
+                return
+            self.player.current_room=next_room
+            self._look_at_room()
+            self._check_for_combat()
+        else:
+            self.player.add_item(item)
+            print(f"✅ Picked up {item['name']}.") 
+    
