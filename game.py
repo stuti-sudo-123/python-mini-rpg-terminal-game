@@ -116,4 +116,13 @@ class Game:
         else:
             self.player.add_item(item)
             print(f"✅ Picked up {item['name']}.") 
+    def _use_item(self,item_name):
+        success,msg=self.player.use_item(item_name)
+        print(msg)
+    def _check_for_combat(self):
+        pass
+    def _check_win(self):
+        if self.player.current_room == "void_nexus":
+            if not self.world.get_live_enemies("void_nexus"):
+                self._victory()
     
